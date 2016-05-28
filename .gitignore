@@ -46,5 +46,5 @@ Network Trash Folder
 Temporary Items
 .apdisk
 STM32F10x_FWLib/src/stm32f10x_wwdg.c
-STM32F10x_FWLib/src/stm32f10x_usart.c
-STM32F10x_FWLib/src/stm32f10x_tim.c
+
+
