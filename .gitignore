@@ -48,3 +48,7 @@ Temporary Items
 STM32F10x_FWLib/src/stm32f10x_wwdg.c
 
 
+*.o
+*.d
+*.crf
+

@@ -14,7 +14,7 @@
 #include "car_control.h"
 #include "esp8266.h"
 #include "math.h"
-
+#include "crc8.h"
 
 
 #define ULTRA_PORT			GPIOB
@@ -30,6 +30,7 @@ short int  f=7,d=9;
 u8 data_pc[100],torque_long,revolving_long=5;//发送给pc端的数据包，转矩的数据长度，转速的数据长度
 char revolving[5];
 u32 temp;
+long crc_code;
 /****************************************************************************************************
 //=======================================液晶屏数据线接线==========================================//
 //DB0       接PD14 
@@ -235,7 +236,56 @@ int main(void)
 		}
 		state_0x0a=0;//接收状态变量清零
 		//data_exist=0;
-	}	
+	}
+	if(state_0x0a1==1)//字符串解析函数
+	{
+		u8 i=0,weizhi=0;
+		data_exist3=bf( data_cu1,ESP_Responses[5]);
+		if(data_exist3!=-1)
+		{
+			data_exist4=bf( data_cu1,ESP_Responses[10]);
+			if(data_exist4!=-1)
+			{	
+				data_exist5=data_exist4-data_exist3-7;
+				if(data_exist5==1)
+				{
+					data_length4=data_cu1[data_exist3+7];
+					data_length4=data_length4-0x30;
+					data_length3=data_length4;
+					weizhi=9;
+				}
+
+				if(data_exist5==2)
+				{
+					data_length4=data_cu1[data_exist3+7];
+					data_length4=data_length4-0x30;
+					data_length4=data_length4*10;
+
+					data_length5=data_cu1[data_exist3+8];
+					data_length5=data_length5-0x30;
+					data_length3=data_length4+data_length5;
+					weizhi=10;
+				}
+
+				for(i=0;i<data_length3;i++)
+				{
+					data_wifi1[i]=data_cu1[data_exist3+weizhi+i];				
+				}
+				//USART_printf(USART1, data_right);//发送通过校验的数据到电脑上方便调试
+				//USART_printf(USART1, "\r\n");
+			}
+
+
+		}
+		cun1=0;
+		for(i=0;i<100;i++)//清空接收数组
+		{
+			data_cu1[i]=0;
+		}
+		state_0x0a1=0;//接收状态变量清零
+		//data_exist=0;
+	}	 
+	data_test=0;
 	for(data_long=0;data_long<9;data_long++)//将接收到的数据进行加和，准备进行校验
 	{
 		data_test+=data_wifi[data_long];
@@ -249,6 +299,21 @@ int main(void)
 
 		}
 	}
+	data_test=0;
+	for(data_long=0;data_long<9;data_long++)//将接收到的数据进行加和，准备进行校验
+	{
+		data_test+=data_wifi1[data_long];
+
+	}
+	if(data_test==data_wifi1[9])//校验通过就将数据转移并且保存
+	{
+		for(data_long=0;data_long<9;data_long++)
+		{
+			data_right[data_long]=data_wifi1[data_long];
+
+		}
+	}
+	
 	for(i=0;i<6;i++)//将转速数据放入data_pc数据包
 	{
 		sprintf(revolving,"%d",juli[i]);
@@ -267,45 +332,14 @@ int main(void)
 			revolving[m]=0;
 		}
 	}
-	switch(data_right[8])//
-	{
-		case 1:
+
 			for(i=0;i<8;i++)
 			{
 				data_pc[32+i+8*data_right[8]]=data_right[i];
 			}
-		break;
-		case 2:
-			for(i=0;i<8;i++)
-			{
-				data_pc[32+i+8*data_right[8]]=data_right[i];
-			}
-		break;
-		case 3:
-			for(i=0;i<8;i++)
-			{
-				data_pc[32+i+8*data_right[8]]=data_right[i];
-			}
-		break;
-		case 4:
-			for(i=0;i<8;i++)
-			{
-				data_pc[32+i+8*data_right[8]]=data_right[i];
-			}
-		break;
-		case 5:
-			for(i=0;i<8;i++)
-			{
-				data_pc[32+i+8*data_right[8]]=data_right[i];
-			}
-		break;
-		case 6:
-			for(i=0;i<8;i++)
-			{
-				data_pc[32+i+8*data_right[8]]=data_right[i];
-			}
-		break;
-	}
+			
+      crc_code = yb_crc(data_pc,80);//计算CRC校验码
+			
 	//USART_printf(USART1, data_pc);//发送通过校验的数据到电脑上方便调试
 	//USART_printf(USART1, "\r\n");
 	//printf(data_right);

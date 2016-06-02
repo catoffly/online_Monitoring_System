@@ -13,9 +13,9 @@
 #include "stdio.h"
 
 #define MAX(x, y) (x) > (y) ? (x) : (y)
-char data_us=0,USART_RX_buf[50],USART_RX=0,data_transfer=0;
-char data_cu[100],state_0x0a;
-u8 cun=0;
+char data_us=0,USART_RX_buf[50],USART_RX=0,data_transfer=0,data_us1=0,USART_RX_buf1[50],USART_RX1;
+char data_cu[100],state_0x0a,data_cu1[100],state_0x0a1;
+u8 cun=0,cun1=0;
 /*
  * 函数名：USART1_Config
  * 描述  ：USART1 GPIO 配置,工作模式配置。115200 8-N-1
@@ -276,6 +276,37 @@ void USART2_IRQHandler(void)                	//串口1中断服务程序
 	 
      } 
 		USART_ClearITPendingBit(USART2,USART_IT_RXNE);
+}
+
+
+void USART3_IRQHandler(void)                	//串口1中断服务程序
+{
+	if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
+		{
+			
+					data_us1 =USART_ReceiveData(USART3);	//读取接收到的数据
+					//USART_SendData(USART1, data_us);
+					USART_RX_buf1[USART_RX1]=data_us1;//一级数组
+					data_cu1[cun1]=USART_RX_buf1[USART_RX1];//二级数组
+					cun1++;
+					USART_RX1++;
+					if(USART_RX1>45)//防止一次数据太多,将最后一位刷成其他数值，最后一位必须是0x00才不会出错
+					{
+						USART_RX1=0;
+					}
+					if(cun1>95)
+					{
+						cun1=0;
+					}
+					if(data_us1==0x0a)
+					{
+						USART_RX1=0;
+						state_0x0a1=1;
+					}
+					
+	 
+     } 
+		USART_ClearITPendingBit(USART3,USART_IT_RXNE);
 }
 int bf( char *text,  char *find)  
 {  
