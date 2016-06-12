@@ -23,7 +23,7 @@
 
 #define TRIG_Send  	PBout(5)
 unsigned short juli[6];
-u8 data_right[30],data_long;
+u8 data_right[30],data_long, data_right1[30];
 char data_test=0;
 short int  j=5,l=10,h,g;
 short int  f=7,d=9;
@@ -223,8 +223,8 @@ int main(void)
 				{
 					data_wifi[i]=data_cu[data_exist+weizhi+i];				
 				}
-				USART_printf(USART1, data_right);//发送通过校验的数据到电脑上方便调试
-				USART_printf(USART1, "\r\n");
+//				USART_printf(USART1, data_right);//发送通过校验的数据到电脑上方便调试
+//				USART_printf(USART1, "\r\n");
 			}
 
 
@@ -309,7 +309,7 @@ int main(void)
 	{
 		for(data_long=0;data_long<9;data_long++)
 		{
-			data_right[data_long]=data_wifi1[data_long];
+			data_right1[data_long]=data_wifi1[data_long];
 
 		}
 	}
@@ -333,15 +333,18 @@ int main(void)
 		}
 	}
 
-			for(i=0;i<8;i++)
-			{
-				data_pc[32+i+8*data_right[8]]=data_right[i];
-			}
-			
+	for(i=0;i<8;i++)
+	{
+		data_pc[32+i+8*(data_right[8]-1)]=data_right[i];
+	}
+	for(i=0;i<8;i++)
+	{
+		data_pc[32+i+8*(data_right1[8]-1)]=data_right1[i];
+	}	
       crc_code = yb_crc(data_pc,80);//计算CRC校验码
 			
-	//USART_printf(USART1, data_pc);//发送通过校验的数据到电脑上方便调试
-	//USART_printf(USART1, "\r\n");
+	USART_printf(USART1, data_pc);//发送通过校验的数据到电脑上方便调试
+	USART_printf(USART1, "\r\n");
 	//printf(data_right);
 	//printf("\r\n");
 	//			printf("电机1=%d ",juli);

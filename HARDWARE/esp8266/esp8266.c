@@ -24,7 +24,7 @@ char *ATCommandsArray[21] = {
 	"AT+CWLIF\r\n",
 	"AT+CWQAP\r\n",
 	"AT+CWSAP=\"llj123\",\"0123456789\",11,3\r\n",
-	"ATE0\r\n",
+	"AT+CWSAP=\"llj234\",\"0123456789\",11,3\r\n",
 	"AT+CIPCLOSE=",
 	"AT+CWMODE=1\r\n",
 	"ATE1\r\n"};
@@ -53,18 +53,24 @@ void esp8266_ap_server_init(void)
 {
 
 		USART_printf(USART2,ATCommandsArray[20] );//开启会显
+		USART_printf(USART3,ATCommandsArray[20] );//开启会显
 		delay_ms(1000);
 		USART_printf(USART2,ATCommandsArray[5] );//ap模式
+		USART_printf(USART3,ATCommandsArray[5] );//ap模式
 		delay_ms(1000);
 		USART_printf(USART2,ATCommandsArray[16] );//AT+CWSAP="ESP8266","12345678",11,0 设置路由
+		USART_printf(USART3,ATCommandsArray[17] );//AT+CWSAP="ESP8266","12345678",11,0 设置路由
 		delay_ms(1000);
 		USART_printf(USART2,ATCommandsArray[8] );//重启
+		USART_printf(USART3,ATCommandsArray[8] );//重启
 		delay_ms(1000);
 		delay_ms(1000);
 		delay_ms(1000);
 		USART_printf(USART2,ATCommandsArray[9] );//AT+CIPMUX=1 设置成多连接
+		USART_printf(USART3,ATCommandsArray[9] );//AT+CIPMUX=1 设置成多连接
 		delay_ms(1000);
 		USART_printf(USART2,ATCommandsArray[11] );//AT+CIPSERVER=1,8080 开启TCP服务端口
+		USART_printf(USART3,ATCommandsArray[11] );//AT+CIPSERVER=1,8080 开启TCP服务端口
 		delay_ms(1000);
 }
 
